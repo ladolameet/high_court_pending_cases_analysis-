@@ -1,0 +1,55 @@
+USE [HighCourtDB1]
+GO
+
+INSERT INTO [dbo].[HighCourtCases]
+           ([CountryYear]
+           ,[CalendarDay]
+           ,[HighCourtName]
+           ,[HighCourtBench]
+           ,[CourtCaseType]
+           ,[CasesInstitutedLastMonth]
+           ,[CasesDisposedLastMonth]
+           ,[PendingCasesLessThan1Yr]
+           ,[PendingCases1To3Yr]
+           ,[PendingCases3To5Yr]
+           ,[PendingCases5To10Yr]
+           ,[PendingCasesAbove10Yr]
+           ,[WritPetitionCases]
+           ,[SecondAppealCases]
+           ,[FirstAppealCases]
+           ,[AppealCases]
+           ,[PetitionCases]
+           ,[RevisionCases]
+           ,[ReferenceCases]
+           ,[SuitCases]
+           ,[ReviewCases]
+           ,[ApplicationCases]
+           ,[CasesInstitutedCurrentYear]
+           ,[CasesDisposedCurrentYear])
+     VALUES
+           (<CountryYear, nvarchar(50),>
+           ,<CalendarDay, date,>
+           ,<HighCourtName, nvarchar(100),>
+           ,<HighCourtBench, nvarchar(100),>
+           ,<CourtCaseType, nvarchar(30),>
+           ,<CasesInstitutedLastMonth, int,>
+           ,<CasesDisposedLastMonth, int,>
+           ,<PendingCasesLessThan1Yr, int,>
+           ,<PendingCases1To3Yr, int,>
+           ,<PendingCases3To5Yr, int,>
+           ,<PendingCases5To10Yr, int,>
+           ,<PendingCasesAbove10Yr, int,>
+           ,<WritPetitionCases, int,>
+           ,<SecondAppealCases, int,>
+           ,<FirstAppealCases, int,>
+           ,<AppealCases, int,>
+           ,<PetitionCases, int,>
+           ,<RevisionCases, int,>
+           ,<ReferenceCases, int,>
+           ,<SuitCases, int,>
+           ,<ReviewCases, int,>
+           ,<ApplicationCases, int,>
+           ,<CasesInstitutedCurrentYear, int,>
+           ,<CasesDisposedCurrentYear, int,>)
+GO
+
