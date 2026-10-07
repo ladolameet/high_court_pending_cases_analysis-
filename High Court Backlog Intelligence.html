@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="light">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>High Court Backlog Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #fff;
+      --tx: #1f2937;
+      --mut: #6b7280;
+      --line: #e5e7eb;
+      --soft: #f3f4f6;
+      --pri: #2563eb;
+      --bad: #b42318;
+      --badbg: #fdecea;
+      --warn: #a15c07;
+      --warnbg: #fdf3dc;
+      --good: #157347;
+      --goodbg: #e3f5ec;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-padding-top: calc(110px + env(safe-area-inset-top, 0px));
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--tx);
+      font: 15px/1.6 Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .wrap {
+      margin: 0 auto;
+      padding: 0 24px
+    }
+
+    header {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 10;
+      background: #fff;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 6px
+    }
+
+    h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -.01em
+    }
+
+    .sub {
+      margin: 0;
+      font-size: .8rem;
+      color: var(--mut)
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px
+    }
+
+    select {
+      background: #fff;
+      color: var(--tx);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font: 500 .85rem Inter, sans-serif;
+      min-height: 38px
+    }
+
+    select:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--pri);
+      outline-offset: 2px
+    }
+
+    nav {
+      display: flex;
+      gap: 2px;
+      overflow-x: auto;
+      scrollbar-width: none
+    }
+
+    nav a {
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--mut);
+      font-size: .84rem;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-bottom: 2px solid transparent
+    }
+
+    nav a:hover {
+      color: var(--pri);
+      border-color: var(--pri)
+    }
+
+    main {
+      padding: 28px 0 8px
+    }
+
+    .hero {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 32px;
+      align-items: center;
+      margin-bottom: 16px
+    }
+
+    .hero h2 {
+      font-size: 1.55rem;
+      line-height: 1.3;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: -.01em
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--mut);
+      max-width: 58ch
+    }
+
+    .big {
+      border-left: 1px solid var(--line);
+      padding-left: 32px
+    }
+
+    .big b {
+      display: block;
+      font-size: 3rem;
+      line-height: 1.1;
+      font-weight: 700;
+      color: var(--pri)
+    }
+
+    .big span {
+      color: var(--mut);
+      font-size: .88rem
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px
+    }
+
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px
+    }
+
+    .kpi small {
+      display: block;
+      font-size: .78rem;
+      color: var(--mut)
+    }
+
+    .kpi b {
+      display: block;
+      font-size: 1.45rem;
+      font-weight: 700;
+      margin: 2px 0;
+      color: var(--c)
+    }
+
+    .kpi span {
+      font-size: .75rem;
+      color: var(--mut);
+      display: block;
+      line-height: 1.4
+    }
+
+    .sec {
+      margin: 48px 0 16px
+    }
+
+    .sec h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700
+    }
+
+    .sec p {
+      margin: 2px 0 0;
+      font-size: .88rem;
+      color: var(--mut)
+    }
+
+    .sec i {
+      display: none
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+      overflow: hidden;
+      margin-bottom: 16px
+    }
+
+    .cl {
+      padding: 24px;
+      min-width: 0
+    }
+
+    .ch {
+      margin-bottom: 18px
+    }
+
+    .ch h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0
+    }
+
+    .ch p {
+      margin: 2px 0 0;
+      font-size: .82rem;
+      color: var(--mut)
+    }
+
+    .cv {
+      position: relative;
+      height: 340px
+    }
+
+    .v .cv {
+      height: 300px
+    }
+
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px
+    }
+
+    .g2 .card {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 0
+    }
+
+    .v .ins {
+      border-left: 0;
+      border-top: 1px solid var(--line)
+    }
+
+    .ins {
+      border-left: 1px solid var(--line);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0
+    }
+
+    .t-bad {
+      --tc: var(--bad);
+      --tb: var(--badbg)
+    }
+
+    .t-warn {
+      --tc: var(--warn);
+      --tb: var(--warnbg)
+    }
+
+    .t-good {
+      --tc: var(--good);
+      --tb: var(--goodbg)
+    }
+
+    .pill {
+      display: inline-block;
+      background: var(--tb);
+      color: var(--tc);
+      border-radius: 99px;
+      padding: 2px 10px;
+      font-size: .74rem;
+      font-weight: 600
+    }
+
+    .head {
+      font-weight: 600;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      margin: 8px 0 6px
+    }
+
+    .find p {
+      margin: 0;
+      font-size: .88rem;
+      color: var(--mut)
+    }
+
+    .act {
+      border-top: 1px solid var(--line);
+      padding-top: 14px
+    }
+
+    .act h4 {
+      margin: 0 0 4px;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--pri)
+    }
+
+    .act p {
+      margin: 0;
+      font-size: .88rem
+    }
+
+    details {
+      margin-top: auto;
+      font-size: .82rem;
+      color: var(--mut)
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 500
+    }
+
+    details p {
+      margin: 6px 0 0
+    }
+
+    .tw {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .86rem
+    }
+
+    th {
+      font-size: .76rem;
+      font-weight: 600;
+      color: var(--mut);
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap
+    }
+
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--soft);
+      vertical-align: top
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0
+    }
+
+    .e {
+      text-align: right;
+      font-variant-numeric: tabular-nums
+    }
+
+    th.e {
+      text-align: right
+    }
+
+    .bar {
+      height: 6px;
+      background: var(--soft);
+      border-radius: 9px;
+      min-width: 60px;
+      overflow: hidden
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--bad)
+    }
+
+    .neg {
+      color: var(--bad);
+      font-weight: 600
+    }
+
+    .pos {
+      color: var(--good);
+      font-weight: 600
+    }
+
+    .mut {
+      color: var(--mut);
+      font-size: .78rem
+    }
+
+    .rng {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: .9rem;
+      margin-bottom: 8px
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--pri)
+    }
+
+    .simbox {
+      margin-top: 20px;
+      text-align: center;
+      background: var(--soft);
+      border-radius: 10px;
+      padding: 20px
+    }
+
+    .simbox b {
+      display: block;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--pri)
+    }
+
+    .goal {
+      background: var(--soft);
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: .92rem
+    }
+
+    .plan {
+      grid-template-columns: minmax(0, 1fr)
+    }
+
+    .pp {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: .74rem;
+      font-weight: 600
+    }
+
+    .pp.Critical {
+      background: var(--badbg);
+      color: var(--bad)
+    }
+
+    .pp.High {
+      background: var(--warnbg);
+      color: var(--warn)
+    }
+
+    .pp.Medium {
+      background: #e8f0fe;
+      color: var(--pri)
+    }
+
+    .res {
+      color: var(--good);
+      font-weight: 500
+    }
+
+    footer {
+      color: var(--mut);
+      font-size: .78rem;
+      padding: 20px 0 32px;
+      text-align: center
+    }
+
+    @media(max-width:1100px) {
+      .kpis {
+        grid-template-columns: repeat(3, 1fr)
+      }
+    }
+
+    @media(max-width:900px) {
+
+      .card,
+      .g2,
+      .hero {
+        grid-template-columns: minmax(0, 1fr)
+      }
+
+      .ins {
+        border-left: 0;
+        border-top: 1px solid var(--line)
+      }
+
+      .big {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding: 16px 0 0
+      }
+    }
+
+    @media(max-width:760px) {
+      #tPlan thead {
+        display: none
+      }
+
+      #tPlan,
+      #tPlan tbody {
+        display: block
+      }
+
+      #tPlan tr {
+        display: block;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        padding: 6px
+      }
+
+      #tPlan td {
+        display: grid;
+        grid-template-columns: 84px 1fr;
+        gap: 8px;
+        border: 0;
+        padding: 6px 8px
+      }
+
+      #tPlan td::before {
+        content: attr(data-l);
+        color: var(--mut);
+        font-size: .76rem;
+        font-weight: 600
+      }
+    }
+
+    @media(max-width:520px) {
+      .wrap {
+        padding: 0 14px
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .hero {
+        padding: 20px
+      }
+
+      .hero h2 {
+        font-size: 1.3rem
+      }
+
+      .big b {
+        font-size: 2.5rem
+      }
+
+      .cl,
+      .ins {
+        padding: 18px
+      }
+
+      .cv {
+        height: 300px
+      }
+
+      .filters {
+        width: 100%
+      }
+
+      select {
+        flex: 1
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="mb-5 pb-5">
+    <div class="wrap">
+      <div class="top">
+        <div>
+          <h1>Indian High Courts: Backlog Intelligence</h1>
+          <p class="sub">Each chart shows what the data means and what to do next</p>
+        </div>
+        <div class="filters"><select id="fType" aria-label="Case type">
+            <option value="">All case types</option>
+            <option>Civil</option>
+            <option>Criminal</option>
+          </select><select id="fCourt" aria-label="High court"></select></div>
+      </div>
+      <nav><a href="#top">Overview</a><a href="#s-where">Where</a><a href="#s-why">Why</a><a href="#s-risk">Risk</a><a
+          href="#s-plan">Action plan</a></nav>
+    </div>
+  </header>
+  <main class="wrap" id="top" style="margin-top: 20px">
+    <section class="hero" id="hero"></section>
+    <section class="kpis" id="kpis"></section>
+    <div id="cards"></div>
+    <div>
+      <section class="card">
+        <div class="cl">
+          <div class="ch">
+            <h2>Priority bench interventions</h2>
+            <p>Score = 45% share over 10 yrs + 25% (5–10) + 10% (3–5) + 20% clearance deficit</p>
+          </div>
+          <div class="tw">
+            <table id="tRisk"></table>
+          </div>
+        </div>
+        <div class="ins" id="i_tRisk"></div>
+      </section>
+      <section class="card">
+        <div class="cl">
+          <div class="ch">
+            <h2>What-if simulator</h2>
+            <p>Add disposal capacity per month</p>
+          </div>
+          <div class="rng"><label for="sim">Extra disposals</label><span id="simOut"
+              style="color:var(--pri)">+20%</span></div>
+          <input type="range" id="sim" min="0" max="60" step="5" value="20">
+          <div id="simRes" class="simbox"></div>
+        </div>
+        <div class="ins" id="i_sim"></div>
+      </section>
+    </div>
+    <div class="sec" id="s-plan"><i>4</i>
+      <h3>What should be done?</h3>
+      <p>A prioritised plan built from the numbers above</p>
+    </div>
+    <section class="card plan">
+      <div class="cl">
+        <div class="ch">
+          <h2>Action plan to clear the backlog</h2>
+          <p>Updates with your filters</p>
+        </div>
+        <div class="goal" id="planGoal"></div>
+        <div class="tw">
+          <table id="tPlan"></table>
+        </div>
+      </div>
+    </section>
+    <footer>Demo data for illustration. Replace with live court data for real decisions.</footer>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script>
+    const $ = s => document.querySelector(s), fmt = n => Math.round(n).toLocaleString('en-IN');
+    const cmp = n => n >= 1e7 ? (n / 1e7).toFixed(2) + ' Cr' : n >= 1e5 ? (n / 1e5).toFixed(2) + ' L' : fmt(n);
+    const pc = x => (x * 100).toFixed(1) + '%', short = s => String(s).replace(/High Court of /, '').replace(/ High Court/, '');
+    const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const AGE = ['< 1 yr', '1–3 yrs', '3–5 yrs', '5–10 yrs', '> 10 yrs'], AGEC = ['#7dd3fc', '#3b82f6', '#f2b84b', '#ea580c', '#c2271d'];
+    const CT = { writ: 'Writ', sec: 'Second appeal', fst: 'First appeal', app: 'Appeal', pet: 'Petition', rev: 'Revision', ref: 'Reference', suit: 'Suit', rvw: 'Review', appl: 'Application' };
+    const SUM = ['instLM', 'dispLM', 'instCY', 'dispCY', 'p1', 'p2', 'p3', 'p4', 'p5', ...Object.keys(CT)];
+    let RAW = [], charts = {};
+    function derive(g) {
+      g.pend = g.p1 + g.p2 + g.p3 + g.p4 + g.p5; g.net = g.instLM - g.dispLM; g.clr = g.instCY ? g.dispCY / g.instCY : null; g.mtc = g.dispLM ? g.pend / g.dispLM : null; g.old = g.pend ? g.p5 / g.pend : 0;
+      g.score = 100 * (.45 * g.old + .25 * (g.pend ? g.p4 / g.pend : 0) + .1 * (g.pend ? g.p3 / g.pend : 0) + .2 * Math.max(0, 1 - (g.clr ?? 1)));
+      g.risk = (g.clr !== null && g.clr < .9) || (g.mtc !== null && g.mtc > 100); return g
+    }
+    function agg(rows, kf) { const m = new Map(); rows.forEach(r => { const k = kf(r); let g = m.get(k); if (!g) { g = { court: r.court, bench: r.bench }; SUM.forEach(f => g[f] = 0); m.set(k, g) } SUM.forEach(f => g[f] += r[f]) }); return [...m.values()].map(derive) }
+    function demo() {
+      let s = 11; const R = () => (s = (s * 16807) % 2147483647) / 2147483647, rows = [];
+      const C = [['Allahabad High Court', ['Allahabad Bench', 'Lucknow Bench'], 5], ['Bombay High Court', ['Principal Bench Mumbai', 'Nagpur Bench', 'Aurangabad Bench', 'Goa Bench'], 2.6], ['Madras High Court', ['Principal Bench Chennai', 'Madurai Bench'], 2.2], ['High Court of Rajasthan', ['Jodhpur Bench', 'Jaipur Bench'], 2.4], ['High Court of Punjab and Haryana', ['Principal Bench Chandigarh'], 3], ['Calcutta High Court', ['Appellate Side', 'Original Side'], 1.7], ['Patna High Court', ['Principal Bench Patna'], 1.3], ['High Court of Madhya Pradesh', ['Jabalpur Bench', 'Indore Bench', 'Gwalior Bench'], 1.6], ['High Court of Orissa', ['Principal Bench Orissa'], .8], ['Gujarat High Court', ['Principal Bench Ahmedabad'], 1.2], ['Karnataka High Court', ['Bengaluru Bench', 'Dharwad Bench'], 1.1], ['High Court of Sikkim', ['Principal Bench Sikkim'], .03], ['High Court of Meghalaya', ['Principal Bench Shillong'], .05]];
+      C.forEach(([court, bs, sc], ci) => bs.forEach(b => ['Civil', 'Criminal'].forEach(type => {
+        const pend = sc * 30000 / bs.length * (.7 + R() * .6) * (type === 'Civil' ? 1 : .5), oldF = .08 + R() * .18 + (ci === 0 ? .22 : 0) + (ci === 4 ? .1 : 0);
+        const rest = pend * (1 - oldF - .32), instLM = pend * (.025 + R() * .02), instCY = instLM * 9 * (.9 + R() * .2);
+        const w = { writ: .3, sec: .04, fst: .1, app: .12, pet: .08, rev: .05, ref: 0, suit: .03, rvw: .03, appl: .2 };
+        const r = { court, bench: b, type, instLM, dispLM: instLM * (.6 + R() * .7), instCY, dispCY: instCY * (.62 + R() * .55), p1: rest * .55, p2: rest * .45, p3: pend * .12, p4: pend * .2, p5: pend * oldF };
+        for (const k in w) r[k] = pend * w[k] * (.5 + R()); SUM.forEach(f => r[f] = Math.round(r[f])); rows.push(r)
+      }))); return rows
+    }
+    const filtered = () => { const t = $('#fType').value, c = $('#fCourt').value; return RAW.filter(r => (!t || r.type === t) && (!c || r.court === c)) };
+    function mk(id, cfg) { charts[id]?.destroy(); charts[id] = new Chart($('#' + id), cfg) }
+    const TONE = { bad: 'Critical', warn: 'Watch', good: 'Healthy' };
+    function ins(id, o) { const e = $('#i_' + id); e.className = 'ins t-' + o.tone; e.innerHTML = `<div class="find"><span class="pill">${TONE[o.tone]}</span><div class="head">${o.head}</div><p>${o.ev}</p></div><div class="act"><h4>Next step</h4><p>${o.act}</p></div><details><summary>How to read this</summary><p>${o.read}</p></details>` }
+    const CARDS = { cAge: ['Where is the backlog sitting?', 'Top 10 courts by pending cases, split by age of case'], cDonut: ['How old is the backlog nationally?', 'Share of pending cases by age band'], cFlow: ['Is the backlog growing or shrinking?', 'Cases filed vs disposed this year'], cType: ['Which case types clog the system?', 'Pending cases by classification'], cRisk: ['Which benches are in danger?', 'Clearance rate vs months to clear (bubble size = pending load)'] };
+    let n = 0; const card = (id, v) => { const c = CARDS[id]; n++; return `<section class="card${v ? ' v' : ''}"><div class="cl"><div class="ch"><h2>${c[0]}</h2><p>${c[1]}</p></div><div class="cv"><canvas id="${id}"></canvas></div></div><div class="ins" id="i_${id}"></div></section>` };
+    const sec = (id, no, t, d) => `<div class="sec" id="${id}"><i>${no}</i><h3>${t}</h3><p>${d}</p></div>`;
+    $('#cards').innerHTML = sec('s-where', 1, 'Where is the problem?', 'How big the backlog is and how old the cases are') + card('cAge') + '<div class="g2">' + card('cDonut', 1) + card('cType', 1) + '</div>' + sec('s-why', 2, 'Why is it growing?', 'Whether courts keep up with new filings') + card('cFlow') + sec('s-risk', 3, 'Who is most at risk?', 'Benches ranked by danger, and what extra capacity could achieve') + card('cRisk');
+
+    function render() {
+      const rows = filtered(); if (!rows.length) return;
+      Chart.defaults.color = css('--mut'); Chart.defaults.borderColor = css('--line'); Chart.defaults.font.family = "Inter,system-ui,sans-serif";
+      const T = agg(rows, () => 1)[0], courts = agg(rows, r => r.court).sort((a, b) => b.pend - a.pend), benches = agg(rows, r => r.court + '|' + r.bench), top = courts.slice(0, 10), atRisk = benches.filter(b => b.risk).length;
+      const kp = (l, v, n, c) => `<div class="kpi" style="--c:${c}"><small>${l}</small><b>${v}</b><span>${n}</span></div>`, B = css('--bad'), G = css('--good'), W = css('--warn'), P = css('--pri');
+      $('#kpis').innerHTML = kp('Total pending', cmp(T.pend), 'cases awaiting disposal', P) + kp('Clearance rate', pc(T.clr), T.clr < 1 ? 'Filing faster than disposing' : 'Disposing faster than filing', T.clr < 1 ? B : G) + kp('Net monthly inflow', (T.net > 0 ? '+' : '') + fmt(T.net), 'filed minus disposed', T.net > 0 ? B : G) + kp('Pending over 10 yrs', pc(T.old), cmp(T.p5) + ' legacy cases', W) + kp('Months to clear', T.mtc.toFixed(0), 'at current pace', P) + kp('Benches at risk', atRisk + ' of ' + benches.length, 'clearance under 90% or over 100 months', B);
+      $('#hero').innerHTML = `<div><h2>${cmp(T.pend)} cases are pending, and the backlog is ${T.net > 0 ? 'still growing' : 'shrinking'}.</h2><p>Courts dispose of ${pc(T.clr)} of what is filed. ${pc(T.old)} of pending cases are over 10 years old, and ${atRisk} of ${benches.length} benches are in the risk zone.</p></div><div class="big"><b>${(T.mtc / 12).toFixed(1)} yrs</b><span>to clear the backlog at today's disposal pace</span></div>`;
+      const base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } };
+      mk('cAge', { type: 'bar', data: { labels: top.map(c => short(c.court)), datasets: AGE.map((a, i) => ({ label: a, data: top.map(c => c['p' + (i + 1)]), backgroundColor: AGEC[i] })) }, options: { ...base, indexAxis: 'y', scales: { x: { stacked: true, ticks: { callback: v => cmp(v) } }, y: { stacked: true, grid: { display: false } } } } });
+      const s3 = top.slice(0, 3), sh = s3.reduce((a, c) => a + c.pend, 0) / T.pend, oldest = courts.filter(c => c.pend > T.pend * .01).sort((a, b) => b.old - a.old)[0] || courts[0];
+      ins('cAge', { tone: 'bad', read: 'Each bar is one court. A longer bar means more pending cases. Orange and red segments are the oldest cases.', head: `${s3.length} courts hold ${pc(sh)} of all pending cases`, ev: `${s3.map(c => short(c.court)).join(', ')} lead the table. ${short(oldest.court)} has the heaviest legacy load: ${pc(oldest.old)} of its cases are over 10 years old.`, act: 'Prioritise judge appointments and extra courtrooms in the top 3 courts first, since that is where most of the backlog sits.' });
+      mk('cDonut', { type: 'doughnut', data: { labels: AGE, datasets: [{ data: [T.p1, T.p2, T.p3, T.p4, T.p5], backgroundColor: AGEC, borderWidth: 2, borderColor: css('--card') }] }, options: { ...base, cutout: '64%', plugins: { legend: base.plugins.legend, tooltip: { callbacks: { label: c => ` ${c.label}: ${cmp(c.raw)} (${pc(c.raw / T.pend)})` } } } } });
+      const o5 = (T.p4 + T.p5) / T.pend;
+      ins('cDonut', { tone: o5 > .3 ? 'bad' : o5 > .2 ? 'warn' : 'good', read: 'The ring is 100% of pending cases. Each slice is an age band. Large orange and red slices mean cases are stuck for years.', head: `${pc(o5)} of cases are older than 5 years`, ev: `Only ${pc(T.p1 / T.pend)} of the stock is under a year old, while ${pc(T.old)} (${cmp(T.p5)} cases) has waited over a decade.`, act: 'Create fast-track benches with fixed hearing timelines for 10+ year cases, so old files stop ageing.' });
+      mk('cFlow', { type: 'bar', data: { labels: top.map(c => short(c.court)), datasets: [{ label: 'Filed (YTD)', data: top.map(c => c.instCY), backgroundColor: '#f2b84b', borderRadius: 3 }, { label: 'Disposed (YTD)', data: top.map(c => c.dispCY), backgroundColor: '#2f9e6b', borderRadius: 3 }] }, options: { ...base, scales: { y: { ticks: { callback: v => cmp(v) } }, x: { grid: { display: false } } } } });
+      const lag = courts.filter(c => c.clr < 1), gap = lag.reduce((a, c) => a + c.instCY - c.dispCY, 0), worstC = [...lag].sort((a, b) => (b.instCY - b.dispCY) - (a.instCY - a.dispCY))[0];
+      ins('cFlow', { tone: lag.length > courts.length / 2 ? 'bad' : lag.length ? 'warn' : 'good', read: 'Compare the two bars per court. If the amber bar (filed) is taller than the green bar (disposed), the backlog is growing there.', head: `${lag.length} of ${courts.length} courts are falling behind`, ev: `Together they added ${cmp(gap)} net cases this year.${worstC ? ` Biggest gap: ${short(worstC.court)} (${cmp(worstC.instCY - worstC.dispCY)} more filed than disposed).` : ''}`, act: 'Set a minimum 100% clearance target per bench and publish a monthly scorecard so lagging courts are visible.' });
+      const tt = Object.keys(CT).map(k => [CT[k], rows.reduce((a, r) => a + r[k], 0)]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]), tot = tt.reduce((a, x) => a + x[1], 0);
+      mk('cType', { type: 'bar', data: { labels: tt.map(x => x[0]), datasets: [{ data: tt.map(x => x[1]), backgroundColor: tt.map((x, i) => i < 2 ? P : '#93b4f0'), borderRadius: 3 }] }, options: { ...base, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => cmp(v) } }, y: { grid: { display: false } } } } });
+      const t2 = (tt[0][1] + (tt[1] ? tt[1][1] : 0)) / tot;
+      ins('cType', { tone: t2 > .5 ? 'warn' : 'good', read: 'Longer bars are bigger case categories. The darker bars mark the top two.', head: `${tt[0][0]} cases are the biggest block (${pc(tt[0][1] / tot)})`, ev: `${tt[0][0]}${tt[1] ? ` and ${tt[1][0]}` : ''} together make up ${pc(t2)} of the categorised pending stock.`, act: `Build dedicated rosters and standard judgment templates for ${tt[0][0].toLowerCase()} matters, since clearing repeat types is the fastest way to cut volume.` });
+      const pts = benches.filter(b => b.mtc && b.clr !== null), PT = f => pts.filter(f).map(b => ({ x: Math.min(b.clr, 2.5), y: b.mtc, r: Math.max(5, Math.sqrt(b.pend) / 32), n: short(b.court) + ' – ' + b.bench, b }));
+      mk('cRisk', { type: 'bubble', data: { datasets: [{ label: 'High risk', data: PT(b => b.risk), backgroundColor: 'rgba(194,39,29,.6)' }, { label: 'Healthy', data: PT(b => !b.risk), backgroundColor: 'rgba(47,158,107,.6)' }] }, options: { ...base, scales: { x: { title: { display: true, text: 'Clearance rate (disposed ÷ filed)' }, ticks: { callback: v => (v * 100) + '%' } }, y: { type: 'logarithmic', title: { display: true, text: 'Months to clear (log scale)' } } }, plugins: { legend: base.plugins.legend, tooltip: { callbacks: { label: c => `${c.raw.n}: ${pc(c.raw.b.clr)} clearance, ${c.raw.b.mtc.toFixed(0)} months, ${fmt(c.raw.b.pend)} pending` } } } } });
+      const w = [...pts].sort((a, b) => b.mtc - a.mtc)[0];
+      ins('cRisk', { tone: atRisk > benches.length / 2 ? 'bad' : atRisk ? 'warn' : 'good', read: 'Left means disposing slower than filing. Higher means more months of work piled up. Red bubbles in the top-left are the danger zone; bigger bubbles carry more cases.', head: `${atRisk} of ${benches.length} benches are in the risk zone`, ev: `${short(w.court)} – ${w.bench} needs about ${w.mtc.toFixed(0)} months (${(w.mtc / 12).toFixed(1)} years) to clear its backlog at today's pace.`, act: `To reach a 5-year horizon, that bench must dispose about ${fmt(w.pend / 60)} cases a month versus ${fmt(w.dispLM)} now.` });
+      const worst = [...benches].sort((a, b) => b.score - a.score).slice(0, 10), mx = worst[0].score || 1;
+      $('#tRisk').innerHTML = '<thead><tr><th>#</th><th>Bench</th><th class="e">Pending</th><th class="e">Over 10 yrs</th><th class="e">Clearance</th><th class="e">Months</th><th>Risk score</th></tr></thead><tbody>' + worst.map((b, i) => `<tr><td>${i + 1}</td><td><b>${short(b.court)}</b><br><span class="mut">${b.bench}</span></td><td class="e">${cmp(b.pend)}</td><td class="e">${pc(b.old)}</td><td class="e ${b.clr < .9 ? 'neg' : 'pos'}">${pc(b.clr)}</td><td class="e">${b.mtc.toFixed(0)}</td><td><div style="display:flex;gap:8px;align-items:center"><div class="bar" style="flex:1"><i style="width:${b.score / mx * 100}%"></i></div><b>${b.score.toFixed(0)}</b></div></td></tr>`).join('') + '</tbody>';
+      ins('tRisk', { tone: 'bad', read: 'A higher risk score means older cases and weaker clearance. Rank 1 needs help first.', head: `${short(worst[0].court)} – ${worst[0].bench} ranks #1`, ev: `${pc(worst[0].old)} of its cases are over 10 years old with ${pc(worst[0].clr)} clearance. The top 3 benches are ${worst.slice(0, 3).map(b => b.bench).join(', ')}.`, act: 'Send additional judges and a case-management cell to the top 3 ranked benches before spreading resources thinner.' });
+      plan(T, courts, lag, gap, tt, worst); sim()
+    }
+    function plan(T, courts, lag, gap, tt, worst) {
+      const need = T.pend / 60, boost = Math.max(0, need / T.dispLM - 1), top3 = courts.slice(0, 3).map(c => short(c.court)).join(', ');
+      $('#planGoal').innerHTML = `<b>Goal: clear the backlog in 5 years.</b> That needs about <b>${fmt(need)}</b> disposals a month versus ${fmt(T.dispLM)} today, a rise of <b>${pc(boost)}</b>, while filings stay at ${fmt(T.instLM)} a month.`;
+      const H = ['#', 'Priority', 'Problem found', 'What to do', 'Who', 'When', 'Expected result'];
+      const R = [
+        ['Critical', `Legacy cases: ${pc(T.old)} of stock (${cmp(T.p5)} cases) is over 10 years old.`, 'Create fast-track benches for 10+ year cases with fixed hearing dates. Review files to close dead, duplicate or settled matters.', 'Chief Justice, Registry', '0–6 months', 'Legacy share roughly halved in 3 years'],
+        ['Critical', `${top3} hold most of the national stock.`, 'Fill judge vacancies and add courtrooms and staff here first. Set up a case-management cell in each.', 'Collegium, Govt. of India', '3–12 months', 'Largest drop in total pending cases'],
+        ['Critical', `${lag.length} of ${courts.length} courts dispose of fewer cases than are filed (gap ${cmp(gap)}).`, 'Set a minimum 100% clearance target per bench. Publish a monthly scorecard and review it with the Chief Justice.', 'High Court administration', '1–3 months', 'Backlog stops growing'],
+        ['High', `Net inflow is ${T.net > 0 ? '+' : ''}${fmt(T.net)} cases every month.`, 'Screen e-filings for defects at entry. Send routine matters to mediation and Lok Adalats. Bunch similar cases for joint orders.', 'Registry, Mediation Centre', '3–6 months', 'Fewer avoidable filings and hearings'],
+        ['High', `${tt[0][0]} matters are the largest category.`, `Run dedicated rosters for ${tt[0][0].toLowerCase()} cases. Use standard judgment templates and group repeat issues.`, 'Roster judges, Law clerks', '2–6 months', 'Faster disposals per sitting'],
+        ['High', `Worst benches: ${worst.slice(0, 3).map(b => b.bench).join(', ')}.`, 'Send extra judges or retired-judge support (ad-hoc appointments) and add research staff to these benches.', 'Chief Justice, State Govt.', '3–9 months', 'Highest-risk benches leave the danger zone'],
+        ['Medium', `Disposal pace must rise ${pc(boost)} to reach a 5-year horizon.`, 'Add court staff, digitise case files, and use scheduling software for listing and adjournment control.', 'Registry, e-Committee', '6–18 months', 'Sustained higher disposal rate'],
+        ['Medium', 'Delay builds up when nobody tracks it.', 'Review age-wise pendency and vacancies every quarter. Cap adjournments and enforce time limits for filings and replies.', 'Chief Justice, Bar Council', 'Ongoing', 'Backlog does not return']];
+      $('#tPlan').innerHTML = '<thead><tr>' + H.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>' + R.map((r, i) => `<tr><td data-l="#"><b>${i + 1}</b></td><td data-l="Priority"><span class="pp ${r[0]}">${r[0]}</span></td><td data-l="Problem">${r[1]}</td><td data-l="Action">${r[2]}</td><td data-l="Who">${r[3]}</td><td data-l="When" style="white-space:nowrap">${r[4]}</td><td data-l="Result" class="res">${r[5]}</td></tr>`).join('') + '</tbody>'
+    }
+    function sim() {
+      const T = agg(filtered(), () => 1)[0], x = +$('#sim').value / 100; $('#simOut').textContent = '+' + Math.round(x * 100) + '%';
+      const gain = T.dispLM * (1 + x) - T.instLM, yrs = gain > 0 ? T.pend / gain / 12 : null;
+      $('#simRes').innerHTML = gain <= 0 ? '<span class="neg">Never clears</span><br><small class="mut">Disposals stay below new filings</small>' : `<small class="mut">Time to clear ${cmp(T.pend)} cases</small><b>${yrs.toFixed(1)} years</b>`;
+      ins('sim', { tone: gain <= 0 ? 'bad' : yrs > 10 ? 'warn' : 'good', read: 'Drag the slider to add disposal capacity. The result shows how long it takes to clear everything.', head: gain <= 0 ? 'This capacity cannot beat new filings' : `${yrs.toFixed(1)} years to zero backlog at +${Math.round(x * 100)}%`, ev: gain <= 0 ? `Filings are ${fmt(T.instLM)}/month and disposals only ${fmt(T.dispLM * (1 + x))}. The backlog keeps growing.` : `Net gain is ${fmt(gain)} cases per month once new filings are absorbed.`, act: 'Find the smallest capacity boost that brings this under 5 years, and use it as the staffing target.' })
+    }
+    RAW = demo();
+    $('#fCourt').innerHTML = '<option value="">All high courts</option>' + [...new Set(RAW.map(r => r.court))].sort().map(c => `<option>${c}</option>`).join('');
+    $('#fType').onchange = $('#fCourt').onchange = render; $('#sim').oninput = sim;
+    render();
+  </script>
+</body>
+
+</html>
